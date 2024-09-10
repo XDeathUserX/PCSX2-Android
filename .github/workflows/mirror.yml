@@ -29,6 +29,7 @@ jobs:
         mkdir -p mirror/.github/workflows/
         cp .github/workflows/mirror.yml mirror/.github/workflows/
         cp .github/workflows/build.yml mirror/.github/workflows/
+        cp .github/workflows/android-build.yml mirror/.github/workflows/
         
         
     

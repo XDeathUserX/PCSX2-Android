@@ -7,12 +7,6 @@ on:
         description: 'select branch to build(default: master)'
         required: false
         default: 'master'
-      flavor:
-        description: 'select flavor to build(default: mainline)'
-        required: false
-        default: 'mainline'
-  schedule:
-    - cron: "0 0 */5 * *"
 
 jobs:
   pcsx2_android_build:
@@ -58,20 +52,20 @@ jobs:
       run: |
         cd ${{ github.workspace }}/PCSX2-Android
         chmod +x ./gradlew
-        ./gradlew "assemble${{ github.event.inputs.flavor || 'mainline' }}Release"
+        ./gradlew "assembleRelease"
         # bash gradlew build
-        mv $(find app/build/outputs/apk -type f | grep -E "\.apk$") ${{ github.workspace }}/pcsx2${{ github.event.inputs.flavor || 'mainline' }}-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+        mv $(find app/build/outputs/apk -type f | grep -E "\.apk$") ${{ github.workspace }}/PCSX2-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
 
     - name: Release PCSX2 (PCSX2-Android)
       uses: softprops/action-gh-release@v2
       with:
-        name: pcsx2 ${{ steps.version.outputs.date }}
-        tag_name: pcsx2
-        files: ${{ github.workspace }}/pcsx2${{ github.event.inputs.flavor || 'mainline' }}-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+        name: PCSX2 ${{ steps.version.outputs.date }}
+        tag_name: PCSX2
+        files: ${{ github.workspace }}/PCSX2-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
 
-    - name: Release pcsx2-android ${{ steps.version.outputs.date }}
+    - name: Release PCSX2 ${{ steps.version.outputs.date }}
       uses: softprops/action-gh-release@v2
       with:
         name: ${{ steps.version.outputs.date }}
         tag_name: ${{ steps.version.outputs.date }}
-        files: ${{ github.workspace }}/pcsx2${{ github.event.inputs.flavor || 'mainline' }}-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+        files: ${{ github.workspace }}/PCSX2-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk

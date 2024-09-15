@@ -19,8 +19,8 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID=true','-DCMAKE_BUILD_TYPE=Release','-DANDROID_STL=c++_static'
-//                arguments '-DANDROID=true','-DCMAKE_BUILD_TYPE=Debug','-DANDROID_STL=c++_static'
+//                arguments '-DANDROID=true','-DCMAKE_BUILD_TYPE=Release','-DANDROID_STL=c++_static'
+                arguments '-DANDROID=true','-DCMAKE_BUILD_TYPE=Debug','-DANDROID_STL=c++_static'
             }
         }
         ndk {

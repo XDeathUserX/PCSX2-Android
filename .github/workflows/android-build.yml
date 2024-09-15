@@ -52,7 +52,7 @@ jobs:
       run: |
         cd ${{ github.workspace }}/PCSX2-Android
         chmod +x ./gradlew
-        ./gradlew "assembleRelWithDebInfo"
+        ./gradlew "assembleDebug"
         # bash gradlew build
         mv $(find app/build/outputs/apk -type f | grep -E "\.apk$") ${{ github.workspace }}/PCSX2-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
 

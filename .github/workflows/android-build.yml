@@ -1,0 +1,71 @@
+name: pcsx2-android-build-alternative
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'select branch to build(default: master)'
+        required: false
+        default: 'master'
+
+jobs:
+  pcsx2_android_build:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 18
+
+    - name: Download PCSX2 source code
+      run: |
+        cd ${{ github.workspace }}
+        git clone --branch ${{ github.event.inputs.branch || 'master' }} https://github.com/XDeathUserX/PCSX2-Android.git --recursive
+        cd PCSX2-Android
+        
+
+    - id: version
+      name: Get version
+      run: |
+        echo "date=$(/bin/date -u "+%Y%m%d")" >> $GITHUB_OUTPUT
+        cd ${{ github.workspace }}/PCSX2-Android
+        echo "hash=$(git log -1 --pretty=format:%H)" >> $GITHUB_OUTPUT
+        echo "short_hash=$(git describe --always --long)" >> $GITHUB_OUTPUT
+        echo "version=$(git describe --tags --always)" >> $GITHUB_OUTPUT
+
+    - name: Set up cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-pcsx2-${{ steps.version.outputs.hash }}
+        restore-keys: |
+            ${{ runner.os }}-pcsx2-
+
+    - name: Prepare environment
+      run: |
+        sudo apt-get install -y ninja-build
+          ln -s /usr/bin/ninja .
+    - name: Build Android
+      run: |
+        cd ${{ github.workspace }}/PCSX2-Android
+        chmod +x ./gradlew
+        ./gradlew "assembleDebug"
+        # bash gradlew build
+        mv $(find app/build/outputs/apk -type f | grep -E "\.apk$") ${{ github.workspace }}/PCSX2-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+
+    - name: Release PCSX2 (PCSX2-Android)
+      uses: softprops/action-gh-release@v2
+      with:
+        name: PCSX2 ${{ steps.version.outputs.date }}
+        tag_name: PCSX2
+        files: ${{ github.workspace }}/PCSX2-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
+
+    - name: Release PCSX2 ${{ steps.version.outputs.date }}
+      uses: softprops/action-gh-release@v2
+      with:
+        name: ${{ steps.version.outputs.date }}
+        tag_name: ${{ steps.version.outputs.date }}
+        files: ${{ github.workspace }}/PCSX2-${{ steps.version.outputs.date }}-${{ steps.version.outputs.version }}.apk
